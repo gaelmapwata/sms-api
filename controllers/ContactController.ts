@@ -1,10 +1,13 @@
 import { Request, Response } from 'express';
 import fs from 'fs';
 import { checkSchema } from 'express-validator';
+import { format, parse } from 'date-fns';
 import Contact from '../models/Contact';
 import contactValidators from '../validators/contact.validator';
 import { handleExpressValidators } from '../utils/express.util';
+import { formatExcelDate } from '../utils/date.util';
 import ImportFileService from '../services/ImportFileService';
+import { ContactRecordI } from '../types/contactRecord';
 
 export default {
   index: async (req: Request, res: Response) => {
@@ -97,7 +100,7 @@ export default {
     }
   },
 
-  saveFileInDB: (req:Request, res:Response) => {
+  saveFileInDB: async (req:Request, res:Response) => {
     try {
       if (!req.file) {
         return res.status(400).json({ message: 'No file uploaded' });
@@ -107,7 +110,21 @@ export default {
       const filePath = req.file.path;
       const data = ImportFileService.importExcelToDb(filePath);
 
-      console.log('data', data);
+      // eslint-disable-next-line max-len
+      const contactPromises: Promise<Contact>[] = (data as ContactRecordI[]).map((record) => {
+        // Convertir la date au format yyyy-MM-dd
+        const formattedDateOfBorn = formatExcelDate(record.dateOfBorn);
+
+        return Contact.create({
+          firstName: record.firstName,
+          dateOfBorn: formattedDateOfBorn,
+          phoneNumber: record.phoneNumber,
+          email: record.email,
+          destinationOf: record.destinationOf,
+          destinationTo: record.destinationTo,
+        });
+      });
+      await Promise.all(contactPromises);
 
       // Supprimer le fichier temporaire après le traitement
       fs.unlinkSync(filePath);

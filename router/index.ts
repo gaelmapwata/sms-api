@@ -153,7 +153,7 @@ router.delete(
 );
 router.post(
   '/contacts/upload',
-  [upload.single('file')],
+  [authJwt.shouldBeLogged, upload.single('file')],
   ContactController.saveFileInDB,
 );
 
