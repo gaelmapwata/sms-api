@@ -5,9 +5,11 @@ import express, { Request, Response } from 'express';
 import UserController from '../controllers/UserController';
 import AuthController from '../controllers/AuthController';
 import authJwt from '../middleware/authJwt';
+import upload from '../middleware/upload';
 import Permission from '../models/Permission';
 import RessourceController from '../controllers/RessourceController';
 import RoleController from '../controllers/RoleController';
+import ContactController from '../controllers/ContactController';
 
 const router = express.Router();
 
@@ -20,7 +22,9 @@ router.get('/', (_: Request, res: Response) => {
  */
 
 router.post('/auth/signin', AuthController.signin as any);
+router.post('/auth/check-otp', AuthController.checkOtp);
 router.get('/auth/user', [authJwt.shouldBeLogged], AuthController.getCurrentUser);
+router.post('/auth/logout', AuthController.logout);
 
 // ----------
 
@@ -112,6 +116,45 @@ router.get(
   '/ressources',
   [authJwt.shouldBeLogged, authJwt.shouldHavePermission(Permission.RESSOURCE.READ)],
   RessourceController.index as any,
+);
+
+/**
+ * contacts routes
+ */
+
+router.get(
+  '/contacts',
+  [authJwt.shouldBeLogged],
+  ContactController.index as any,
+);
+
+router.get(
+  '/contacts/:id',
+  [authJwt.shouldBeLogged],
+  ContactController.show,
+);
+
+router.post(
+  '/contacts',
+  [authJwt.shouldBeLogged],
+  ContactController.store as any,
+);
+
+router.put(
+  '/contacts/:id',
+  [authJwt.shouldBeLogged],
+  ContactController.update as any,
+);
+
+router.delete(
+  '/contacts/:id',
+  [authJwt.shouldBeLogged],
+  ContactController.delete,
+);
+router.post(
+  '/contacts/upload',
+  [upload.single('file')],
+  ContactController.saveFileInDB,
 );
 
 // ----------

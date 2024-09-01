@@ -1,8 +1,8 @@
 import express, { Express } from 'express';
 import dotenv from 'dotenv';
 import http from 'http';
-import expressFormData from 'express-form-data';
-import os from 'os';
+// import expressFormData from 'express-form-data';
+// import os from 'os';
 import cors from 'cors';
 import path from 'path';
 import router from './router';
@@ -38,11 +38,11 @@ app.use((_, res, next) => {
  * Express-form-data
  */
 
-const options = {
-  uploadDir: os.tmpdir(),
-  autoClean: true,
-};
-app.use(expressFormData.parse(options));
+// const options = {
+//   uploadDir: os.tmpdir(),
+//   autoClean: true,
+// };
+// // app.use(expressFormData.parse(options));
 
 /**
  * Bind router to app
