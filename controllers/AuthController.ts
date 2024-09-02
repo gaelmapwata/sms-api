@@ -59,7 +59,8 @@ export default {
         await OrangeService.sendSMS(userToLogin.phoneNumber, userOTP);
         return res.status(200).json({ msg: 'authentification réussie' });
       } catch (error) {
-        return res.status(500).json({ message: 'Une erreur est survenue lors de l\'authentification.' });
+        console.log('error ---||--', error);
+        return res.status(500).json({ message: `Une erreur est survenue lors de l'authentification.${error}` });
       }
     },
   ],
