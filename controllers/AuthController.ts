@@ -21,48 +21,46 @@ export default {
   signin: [
     checkSchema(authValidators.signinSchema),
     async (req: Request, res: Response) => {
-      if (handleExpressValidators(req, res)) {
-        return null;
-      }
+      try {
+        if (handleExpressValidators(req, res)) {
+          return null;
+        }
 
-      const userToLogin = await User.findOne(
-        { where: { email: req.body.email } },
-      );
+        const userToLogin = await User.findOne(
+          { where: { email: req.body.email } },
+        );
 
-      if (!userToLogin) {
-        return res.status(401).send({ message: "Ce compte n'a pas été retrouvé" });
-      }
+        if (!userToLogin) {
+          return res.status(401).send({ message: "Ce compte n'a pas été retrouvé" });
+        }
 
-      const passwordIsValid = bcrypt.compareSync(
-        req.body.password,
-        userToLogin.password,
-      );
+        const passwordIsValid = bcrypt.compareSync(
+          req.body.password,
+          userToLogin.password,
+        );
 
-      if (!passwordIsValid) {
-        return res.status(401).send({
-          token: null,
-          message: 'Mot de passe invalide',
-        });
-      }
+        if (!passwordIsValid) {
+          return res.status(401).send({
+            token: null,
+            message: 'Mot de passe invalide',
+          });
+        }
 
-      // Destroy expired OTP
-      Otp.destroy({
-        where: {
-          email: req.body.email,
-          expirationDate: {
-            [Op.lt]: new Date(),
+        // Destroy expired OTP
+        Otp.destroy({
+          where: {
+            email: req.body.email,
+            expirationDate: {
+              [Op.lt]: new Date(),
+            },
           },
-        },
-      });
-
-      // create new OTP
-      const { otp: userOTP } = await OtpService.createOtpForUser(req.body.email);
-
-      await OrangeService.sendSMS(userToLogin.phoneNumber, userOTP);
-
-      console.log('otp', userOTP);
-
-      return res.status(200).json({ msg: 'authentification réussie' });
+        });
+        const { otp: userOTP } = await OtpService.createOtpForUser(req.body.email);
+        await OrangeService.sendSMS(userToLogin.phoneNumber, userOTP);
+        return res.status(200).json({ msg: 'authentification réussie' });
+      } catch (error) {
+        return res.status(500).json({ message: 'Une erreur est survenue lors de l\'authentification.' });
+      }
     },
   ],
 
