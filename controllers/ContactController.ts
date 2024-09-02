@@ -150,7 +150,7 @@ export default {
 
       const updatedContacts = contacts.map((contact) => {
         let { phoneNumber } = contact;
-        if (phoneNumber.startsWith('+243')) {
+        if (phoneNumber.startsWith('+243' || '243')) {
           phoneNumber = phoneNumber.slice(-9);
         } else if (phoneNumber.startsWith('0')) {
           phoneNumber = phoneNumber.slice(-9);
