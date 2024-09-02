@@ -60,7 +60,7 @@ export default {
         return res.status(200).json({ msg: 'authentification réussie' });
       } catch (error) {
         console.log('error ---||--', error);
-        return res.status(500).json({ message: `Une erreur est survenue lors de l'authentification.${error}` });
+        return res.status(500).json({ message: 'Une erreur est survenue lors de l\'authentification' });
       }
     },
   ],
