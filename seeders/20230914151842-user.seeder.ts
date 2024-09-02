@@ -7,6 +7,7 @@ import Role from '../models/Role';
 
 interface IUserPayload {
   email: string;
+  phoneNumber: string;
   password: string;
   roleName: string;
 }
@@ -14,21 +15,25 @@ interface IUserPayload {
 const USERS: IUserPayload[] = [
   {
     email: 'admin@user.com',
+    phoneNumber: '810951614',
     password: '1234',
     roleName: 'admin',
   },
   {
     email: 'user1@user.com',
+    phoneNumber: '810951814',
     password: '1234',
     roleName: 'user',
   },
   {
     email: 'user2@user.com',
+    phoneNumber: '810851814',
     password: '1235',
     roleName: 'user',
   },
   {
     email: 'user3@user.com',
+    phoneNumber: '810051814',
     password: '1236',
     roleName: 'user',
   },
@@ -41,6 +46,7 @@ async function saveUser(user: IUserPayload, role: Role | undefined) {
       where: { email: user.email },
       defaults: {
         email: user.email,
+        phoneNumber: user.phoneNumber,
         password: hashedPassword,
       },
     });

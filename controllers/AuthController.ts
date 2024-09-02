@@ -6,6 +6,7 @@ import authValidators from '../validators/auth.validator';
 import { Request } from '../types/expressOverride';
 import { handleExpressValidators } from '../utils/express.util';
 import OtpService from '../services/OtpService';
+import OrangeService from '../services/OrangeService';
 import User from '../models/User';
 import Role from '../models/Role';
 import Permission from '../models/Permission';
@@ -56,6 +57,8 @@ export default {
 
       // create new OTP
       const { otp: userOTP } = await OtpService.createOtpForUser(req.body.email);
+
+      await OrangeService.sendSMS(userToLogin.phoneNumber, userOTP);
 
       console.log('otp', userOTP);
 

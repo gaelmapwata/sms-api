@@ -16,6 +16,9 @@ export default class User extends Model {
     email!: string;
 
   @Column
+    phoneNumber!: string;
+
+  @Column
     password!: string;
 
   @BelongsToMany(() => Role, () => UserRole)
