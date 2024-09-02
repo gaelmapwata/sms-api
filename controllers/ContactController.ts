@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import fs from 'fs';
+import { Op } from 'sequelize';
 import { checkSchema } from 'express-validator';
 import { format, parse } from 'date-fns';
 import Contact from '../models/Contact';
@@ -7,6 +8,7 @@ import contactValidators from '../validators/contact.validator';
 import { handleExpressValidators } from '../utils/express.util';
 import { formatExcelDate } from '../utils/date.util';
 import ImportFileService from '../services/ImportFileService';
+import OrangeService from '../services/OrangeService';
 import { ContactRecordI } from '../types/contactRecord';
 
 export default {
@@ -130,6 +132,35 @@ export default {
       fs.unlinkSync(filePath);
 
       res.status(200).json({ message: 'File processed and data saved successfully' });
+    } catch (error) {
+      console.log(error);
+    }
+  },
+
+  sendSMS: async (req:Request, res:Response) => {
+    try {
+      const { contactIds, message } = req.body;
+      const contacts = await Contact.findAll({
+        where: {
+          id: {
+            [Op.in]: contactIds,
+          },
+        },
+      });
+
+      const updatedContacts = contacts.map((contact) => {
+        let { phoneNumber } = contact;
+        if (phoneNumber.startsWith('+243')) {
+          phoneNumber = phoneNumber.slice(-9);
+        } else if (phoneNumber.startsWith('0')) {
+          phoneNumber = phoneNumber.slice(-9);
+        }
+        return phoneNumber;
+      });
+
+      const feedbackSms = await OrangeService.sendSMS(updatedContacts.join(''), message);
+
+      res.status(200).json(feedbackSms);
     } catch (error) {
       console.log(error);
     }

@@ -156,6 +156,11 @@ router.post(
   [authJwt.shouldBeLogged, upload.single('file')],
   ContactController.saveFileInDB,
 );
+router.post(
+  '/contacts/send-sms',
+  [authJwt.shouldBeLogged],
+  ContactController.sendSMS,
+);
 
 // ----------
 
