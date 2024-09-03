@@ -134,6 +134,7 @@ export default {
       res.status(200).json({ message: 'File processed and data saved successfully' });
     } catch (error) {
       console.log(error);
+      return res.status(500).json(error);
     }
   },
 
