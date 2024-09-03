@@ -22,6 +22,22 @@ const userValidators = {
         },
       },
     },
+    phoneNumber: {
+      notEmpty: {
+        errorMessage: 'Le champ "phoneNumber" est obligatoire',
+      },
+      custom: {
+        options: async (value: string) => {
+          const user = await User.findOne({ where: { phoneNumber: value }, paranoid: false });
+          if (user && !user.deletedAt) {
+            throw new Error('Un utilisateur ayant ce numero de telephone existe déjà');
+          }
+          if (user) {
+            throw new Error('Ce numero de telephone a déjà été utilisé par un utilisateur supprimé');
+          }
+        },
+      },
+    },
     password: {
       isString: {
         errorMessage: 'Le champ "password" doit être une chaîne de caractère valide',
@@ -49,6 +65,30 @@ const userValidators = {
             }
             if (existUser) {
               throw new Error('Cet email a déjà été utilisé par un utilisateur supprimé');
+            }
+          }
+        },
+      },
+    },
+    phoneNumber: {
+      optional: true,
+      notEmpty: {
+        errorMessage: 'Le champ "phoneNumber" est obligatoire',
+      },
+      custom: {
+        options: async (value: string, { req }: { req: unknown }) => {
+          const { id } = (req as Request).params;
+          const user = await User.findByPk(id);
+          if (user && user.phoneNumber !== value) {
+            const existUser = await User.findOne({
+              where: { phoneNumber: value },
+              paranoid: false,
+            });
+            if (existUser && !existUser.deletedAt) {
+              throw new Error('Un utilisateur ayant ce numero de telephone existe déjà');
+            }
+            if (existUser) {
+              throw new Error('Ce numero de telephone a déjà été utilisé par un utilisateur supprimé');
             }
           }
         },

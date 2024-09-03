@@ -10,7 +10,7 @@ import UserRole from './UserRole';
   paranoid: true,
 })
 export default class User extends Model {
-  static fillable = ['email', 'password'];
+  static fillable = ['email', 'password', 'phoneNumber'];
 
   @Column
     email!: string;
