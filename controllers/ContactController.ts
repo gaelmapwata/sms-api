@@ -23,6 +23,7 @@ export default {
       const contactsAndCount = await Contact.findAndCountAll({
         ...limitQuery,
         offset,
+        order: ['firstName'],
       });
 
       const contactsSize = contactsAndCount.count;
