@@ -8,7 +8,7 @@ import contactValidators from '../validators/contact.validator';
 import { handleExpressValidators } from '../utils/express.util';
 import { formatExcelDate } from '../utils/date.util';
 import ImportFileService from '../services/ImportFileService';
-import OrangeService from '../services/OrangeService';
+import DreamSmsService from '../services/DreamSmsService';
 import { ContactRecordI } from '../types/contactRecord';
 
 export default {
@@ -150,15 +150,20 @@ export default {
 
       const updatedContacts = contacts.map((contact) => {
         let { phoneNumber } = contact;
-        if (phoneNumber.startsWith('+243' || '243')) {
-          phoneNumber = phoneNumber.slice(-9);
+        if (phoneNumber.startsWith('+243')) {
+          phoneNumber = phoneNumber.slice(1);
+        } else if (phoneNumber.startsWith('243')) {
+          return phoneNumber;
         } else if (phoneNumber.startsWith('0')) {
-          phoneNumber = phoneNumber.slice(-9);
+          phoneNumber = `243${phoneNumber.slice(1)}`;
+        } else if (!phoneNumber.startsWith('243')) {
+          // Si le numéro ne commence pas par '243', l'ajouter au début
+          phoneNumber = `243${phoneNumber}`;
         }
         return phoneNumber;
       });
 
-      const feedbackSms = await OrangeService.sendSMS(updatedContacts.join(''), message);
+      const feedbackSms = await DreamSmsService.sendSmsMultiPhoneNumber(updatedContacts.join(','), message);
 
       res.status(200).json(feedbackSms);
     } catch (error) {

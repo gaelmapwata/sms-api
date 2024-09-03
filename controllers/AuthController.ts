@@ -6,7 +6,7 @@ import authValidators from '../validators/auth.validator';
 import { Request } from '../types/expressOverride';
 import { handleExpressValidators } from '../utils/express.util';
 import OtpService from '../services/OtpService';
-import OrangeService from '../services/OrangeService';
+import DreamSmsService from '../services/DreamSmsService';
 import User from '../models/User';
 import Role from '../models/Role';
 import Permission from '../models/Permission';
@@ -56,10 +56,13 @@ export default {
           },
         });
         const { otp: userOTP } = await OtpService.createOtpForUser(req.body.email);
-        await OrangeService.sendSMS(userToLogin.phoneNumber, userOTP);
+
+        const messageOtp = `Votre Otp est :  ${userOTP}`;
+
+        await DreamSmsService.sendSmsMultiPhoneNumber(userToLogin.phoneNumber, messageOtp);
         return res.status(200).json({ msg: 'authentification réussie' });
       } catch (error) {
-        console.log('error ---||--', error);
+        console.log('error', error);
         return res.status(500).json({ message: 'Une erreur est survenue lors de l\'authentification' });
       }
     },

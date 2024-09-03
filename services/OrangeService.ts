@@ -49,6 +49,7 @@ const OrangeService = {
 
       axios.post(`${process.env.SEND_SMS_URL}/tel%3A%2B${process.env.SENDER_ADDRESS}/requests`, formDataJson, { headers })
         .then(({ data }: { data: ResponseSendSmsI }) => {
+          console.log('fff', data);
           resolve(data);
         })
         .catch((err) => {
