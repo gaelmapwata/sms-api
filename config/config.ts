@@ -1,7 +1,19 @@
 import dotenv from 'dotenv';
 import { Dialect } from 'sequelize';
+import { env } from 'process';
 
 dotenv.config();
+
+let username; let password; let database; let host; let port; let dialect;
+
+if (env.NODE_ENV === 'production' && process.env.DATABASE_URL) {
+  let url = process.env.DATABASE_URL;
+  [dialect, url] = url.split('://');
+  [username] = url.split('@')[0].split(':');
+  [, password] = url.split('@')[0].split(':');
+  [host, url] = url.split('@')[1].split(':');
+  [port, database] = url.split('/');
+}
 
 export const development = {
   username: process.env.DB_USER_NAME,
@@ -28,17 +40,18 @@ export const test = {
   },
 };
 export const production = {
-  username: process.env.DB_USER_NAME,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  dialect: process.env.DB_DIALECT as Dialect,
+  username: username || process.env.DB_USER_NAME,
+  password: password || process.env.DB_PASSWORD,
+  database: database || process.env.DB_NAME,
+  host: host || process.env.DB_HOST,
+  port: port || process.env.DB_PORT,
+  dialect: (dialect || process.env.DB_DIALECT) as Dialect,
   dialectOptions: {
     bigNumberStrings: true,
-    // ssl: {
-    //   ca: readFileSync(`${__dirname}/mysql-ca-main.crt`),
-    // },
+    ssl: {
+      require: true,
+      rejectUnauthorized: false,
+    },
   },
   logging: false,
   seederStorage: 'sequelize',

@@ -4,6 +4,7 @@ import User from '../models/User';
 import userValidators from '../validators/user.validator';
 import { bcryptHashPassword } from '../utils/bcrypt.util';
 import { handleExpressValidators } from '../utils/express.util';
+import Role from '../models/Role';
 
 export default {
   index: async (req: Request, res: Response) => {
@@ -19,6 +20,7 @@ export default {
         offset,
         order: ['email'],
         attributes: { exclude: ['password'] },
+        include: [Role],
       });
 
       const usersSize = usersAndCount.count;

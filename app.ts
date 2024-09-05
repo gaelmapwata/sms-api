@@ -66,7 +66,7 @@ sequelize.authenticate()
  * Run server
  */
 
-const port = process.env.NODE_SERVER_PORT;
+const port = process.env.NODE_SERVER_PORT || process.env.PORT;
 server.listen(port, () => {
   // eslint-disable-next-line no-console
   console.log(`app listening on port ${port}`);

@@ -23,6 +23,7 @@ export default {
       const contactsAndCount = await Contact.findAndCountAll({
         ...limitQuery,
         offset,
+        order: ['firstName'],
       });
 
       const contactsSize = contactsAndCount.count;
@@ -134,6 +135,7 @@ export default {
       res.status(200).json({ message: 'File processed and data saved successfully' });
     } catch (error) {
       console.log(error);
+      return res.status(500).json(error);
     }
   },
 
@@ -168,6 +170,7 @@ export default {
       res.status(200).json(feedbackSms);
     } catch (error) {
       console.log(error);
+      return res.status(500).json(error);
     }
   },
 };
