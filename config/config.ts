@@ -49,6 +49,7 @@ export const production = {
   dialectOptions: {
     bigNumberStrings: true,
     ssl: {
+      require: true,
       rejectUnauthorized: false,
     },
   },
