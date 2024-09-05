@@ -17,6 +17,21 @@ const jwt = require('jsonwebtoken');
 
 const TOKEN_EXPIRATION_TIME_IN_MS = 2592000; // 30 days
 
+function checkPhoneNumber(phoneNumber: string) {
+  let modifiedPhoneNumber = phoneNumber;
+  if (modifiedPhoneNumber.startsWith('+243')) {
+    modifiedPhoneNumber = modifiedPhoneNumber.slice(1);
+  } else if (modifiedPhoneNumber.startsWith('243')) {
+    return modifiedPhoneNumber;
+  } else if (modifiedPhoneNumber.startsWith('0')) {
+    modifiedPhoneNumber = `243${modifiedPhoneNumber.slice(1)}`;
+  } else if (!modifiedPhoneNumber.startsWith('243')) {
+    modifiedPhoneNumber = `243${modifiedPhoneNumber}`;
+  }
+
+  return modifiedPhoneNumber;
+}
+
 export default {
   signin: [
     checkSchema(authValidators.signinSchema),
@@ -59,7 +74,9 @@ export default {
 
         const messageOtp = `Votre Otp est :  ${userOTP}`;
 
-        await DreamSmsService.sendSmsMultiPhoneNumber(userToLogin.phoneNumber, messageOtp);
+        const phoneNumber = checkPhoneNumber(userToLogin.phoneNumber);
+
+        await DreamSmsService.sendSmsMultiPhoneNumber(phoneNumber, messageOtp);
         return res.status(200).json({ msg: 'authentification réussie' });
       } catch (error) {
         console.log('error', error);
