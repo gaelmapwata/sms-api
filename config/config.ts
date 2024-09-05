@@ -36,9 +36,7 @@ export const production = {
   dialect: process.env.DB_DIALECT as Dialect,
   dialectOptions: {
     bigNumberStrings: true,
-    // ssl: {
-    //   ca: readFileSync(`${__dirname}/mysql-ca-main.crt`),
-    // },
+    ssl: true,
   },
   logging: false,
   seederStorage: 'sequelize',
