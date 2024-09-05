@@ -45,7 +45,7 @@ export const production = {
   database: database || process.env.DB_NAME,
   host: host || process.env.DB_HOST,
   port: port || process.env.DB_PORT,
-  dialect: dialect || process.env.DB_DIALECT as Dialect,
+  dialect: (dialect || process.env.DB_DIALECT) as Dialect,
   dialectOptions: {
     bigNumberStrings: true,
     ssl: {
