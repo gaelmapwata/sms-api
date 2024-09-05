@@ -143,10 +143,21 @@ export default {
   delete: async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
-      const user = await User.destroy({
+      const user = await User.findByPk(id);
+
+      if (!user) {
+        return res.status(404).json({ msg: 'L\'utilisateur n\'a pas été retrouvé' });
+      }
+
+      await User.update({
+        email: `${user.email}-deleted_at-${new Date().toISOString()}`,
+        phoneNumber: `${user.phoneNumber}-deleted_at-${new Date().toISOString()}`,
+      }, { where: { id } });
+
+      await User.destroy({
         where: { id },
       });
-      return res.status(204).json(user);
+      return res.status(204).json(null);
     } catch (error) {
       return res.status(500).json(error);
     }

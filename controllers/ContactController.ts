@@ -94,10 +94,20 @@ export default {
   delete: async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
-      const contact = await Contact.destroy({
+      const contact = await Contact.findByPk(id);
+
+      if (!contact) {
+        return res.status(404).json({ msg: 'Ce contact n\'a pas été retrouvé' });
+      }
+
+      await Contact.update({
+        phoneNumber: `${contact.phoneNumber}-deleted_at-${new Date().toISOString()}`,
+      }, { where: { id } });
+
+      await Contact.destroy({
         where: { id },
       });
-      return res.status(204).json(contact);
+      return res.status(204).json(null);
     } catch (error) {
       return res.status(500).json(error);
     }
