@@ -162,6 +162,12 @@ router.post(
   ContactController.sendSMS,
 );
 
+router.post(
+  '/contacts/send-whatsapp',
+  [authJwt.shouldBeLogged],
+  ContactController.sendWhatsapp,
+);
+
 // ----------
 
 router.get('/protected', [authJwt.shouldBeLogged], (_: Request, res: Response) => {

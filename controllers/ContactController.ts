@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import fs from 'fs';
 import { Op } from 'sequelize';
 import { checkSchema } from 'express-validator';
-import { format, parse } from 'date-fns';
 import Contact from '../models/Contact';
 import contactValidators from '../validators/contact.validator';
 import { handleExpressValidators } from '../utils/express.util';
@@ -10,6 +9,7 @@ import { formatExcelDate } from '../utils/date.util';
 import ImportFileService from '../services/ImportFileService';
 import DreamSmsService from '../services/DreamSmsService';
 import { ContactRecordI } from '../types/contactRecord';
+import InfobipService from '../services/InfobipService';
 
 export default {
   index: async (req: Request, res: Response) => {
@@ -142,7 +142,7 @@ export default {
       // Supprimer le fichier temporaire après le traitement
       fs.unlinkSync(filePath);
 
-      res.status(200).json({ message: 'File processed and data saved successfully' });
+      return res.status(200).json({ message: 'File processed and data saved successfully' });
     } catch (error) {
       console.log(error);
       return res.status(500).json(error);
@@ -177,7 +177,53 @@ export default {
 
       const feedbackSms = await DreamSmsService.sendSmsMultiPhoneNumber(updatedContacts.join(','), message);
 
-      res.status(200).json(feedbackSms);
+      return res.status(200).json(feedbackSms);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json(error);
+    }
+  },
+
+  sendWhatsapp: async (req:Request, res:Response) => {
+    try {
+      const {
+        contactIds, message, type, templateName,
+      } = req.body;
+      const contacts = await Contact.findAll({
+        where: {
+          id: {
+            [Op.in]: contactIds,
+          },
+        },
+      });
+
+      const updatedContacts: Contact[] = contacts.map((contact) => {
+        let { phoneNumber } = contact;
+        if (phoneNumber.startsWith('+243')) {
+          phoneNumber = phoneNumber.slice(1);
+        } else if (phoneNumber.startsWith('0')) {
+          phoneNumber = `243${phoneNumber.slice(1)}`;
+        } else if (!phoneNumber.startsWith('243')) {
+          // Si le numéro ne commence pas par '243', l'ajouter au début
+          phoneNumber = `243${phoneNumber}`;
+        }
+        const newContact = contact;
+        newContact.phoneNumber = phoneNumber;
+        return newContact;
+      });
+
+      let response;
+      if (type === 'message') {
+        response = await InfobipService
+          .sendWhatsappMessages(updatedContacts, message);
+      } else if (type === 'template') {
+        response = await InfobipService
+          .sendWhatsappTemplateMessages(updatedContacts, templateName);
+      } else {
+        return res.status(400).json({ message: 'Type de message non valide' });
+      }
+
+      return res.status(200).json(response);
     } catch (error) {
       console.log(error);
       return res.status(500).json(error);

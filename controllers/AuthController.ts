@@ -73,10 +73,11 @@ export default {
         const { otp: userOTP } = await OtpService.createOtpForUser(req.body.email);
 
         const messageOtp = `Votre Otp est :  ${userOTP}`;
+        console.log('messageOtp', messageOtp);
 
         const phoneNumber = checkPhoneNumber(userToLogin.phoneNumber);
 
-        await DreamSmsService.sendSmsMultiPhoneNumber(phoneNumber, messageOtp);
+        // await DreamSmsService.sendSmsMultiPhoneNumber(phoneNumber, messageOtp);
         return res.status(200).json({ msg: 'authentification réussie' });
       } catch (error) {
         console.log('error', error);
