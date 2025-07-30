@@ -197,28 +197,28 @@ export default {
         },
       });
 
-      const updatedContacts: Contact[] = contacts.map((contact) => {
-        let { phoneNumber } = contact;
-        if (phoneNumber.startsWith('+243')) {
-          phoneNumber = phoneNumber.slice(1);
-        } else if (phoneNumber.startsWith('0')) {
-          phoneNumber = `243${phoneNumber.slice(1)}`;
-        } else if (!phoneNumber.startsWith('243')) {
-          // Si le numéro ne commence pas par '243', l'ajouter au début
-          phoneNumber = `243${phoneNumber}`;
-        }
-        const newContact = contact;
-        newContact.phoneNumber = phoneNumber;
-        return newContact;
-      });
+      // const updatedContacts: Contact[] = contacts.map((contact) => {
+      //   let { phoneNumber } = contact;
+      //   if (phoneNumber.startsWith('+243')) {
+      //     phoneNumber = phoneNumber.slice(1);
+      //   } else if (phoneNumber.startsWith('0')) {
+      //     phoneNumber = `243${phoneNumber.slice(1)}`;
+      //   } else if (!phoneNumber.startsWith('243')) {
+      //     // Si le numéro ne commence pas par '243', l'ajouter au début
+      //     phoneNumber = `243${phoneNumber}`;
+      //   }
+      //   const newContact = contact;
+      //   newContact.phoneNumber = phoneNumber;
+      //   return newContact;
+      // });
 
       let response;
       if (type === 'message') {
         response = await InfobipService
-          .sendWhatsappMessages(updatedContacts, message);
+          .sendWhatsappMessages(contacts, message);
       } else if (type === 'template') {
         response = await InfobipService
-          .sendWhatsappTemplateMessages(updatedContacts, templateName);
+          .sendWhatsappTemplateMessages(contacts, templateName);
       } else {
         return res.status(400).json({ message: 'Type de message non valide' });
       }
