@@ -11,6 +11,7 @@ import User from '../models/User';
 import Role from '../models/Role';
 import Permission from '../models/Permission';
 import Otp from '../models/Otp';
+import AuthService from '../services/AuthService';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const jwt = require('jsonwebtoken');
@@ -75,8 +76,9 @@ export default {
         const messageOtp = `Votre Otp est :  ${userOTP}`;
         console.log('messageOtp', messageOtp);
 
-        const phoneNumber = checkPhoneNumber(userToLogin.phoneNumber);
+        // const phoneNumber = checkPhoneNumber(userToLogin.phoneNumber);
 
+        AuthService.sendOtpToUser(userToLogin.email, userOTP);
         // await DreamSmsService.sendSmsMultiPhoneNumber(phoneNumber, messageOtp);
         return res.status(200).json({ msg: 'authentification réussie' });
       } catch (error) {
